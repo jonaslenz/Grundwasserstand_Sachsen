@@ -9,7 +9,7 @@ Messstellen = pd.read_csv('https://www.umwelt.sachsen.de/umwelt/infosysteme/niwi
                           thousands='.',
                           decimal=',',
                           index_col='MKZ')
-c1, c2 = st.columns(1,2)
+c1, c2 = st.columns([0.3,0.7])
 
 with c1:
   st.write(Messstellen)
