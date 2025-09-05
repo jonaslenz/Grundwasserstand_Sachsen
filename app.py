@@ -9,5 +9,10 @@ Messstellen = pd.read_csv('https://www.umwelt.sachsen.de/umwelt/infosysteme/niwi
                           thousands='.',
                           decimal=',',
                           index_col='MKZ')
+c1, c2 = st.columns(1,2)
 
-st.write(Messstellen)
+with c1:
+  st.write(Messstellen)
+
+with c2:
+  st.map(data=Messstellen, latitude='RW_ETRS89', longitude='HW_ETRS89')
