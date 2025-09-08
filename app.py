@@ -54,9 +54,15 @@ with c1:
 
 #  st.write(MKZs)
 #  st.write(Messstellen.loc[MKZs, "MKZ"])
-  st.map(data=Messstellen.iloc[MKZs])
+  st.map(data=Messstellen.iloc[MKZs],
+         use_container_width=True,
+         height=200,
+         zoom = 5)
 
 with c2:
+  if len(MKZs) > 15:
+    st.warning("Achtung, zuviel Daten in Darstellung, bitte weniger Messstellen auswählen.")
+    st.stop()
   if st.checkbox("Zeige Diagramm"):
     type = st.radio(label = "type", options = ["WERT_IM_HOEHENSYSTEM", "WERT_UNTER_GELAENDE"])
     series = {}
@@ -78,10 +84,12 @@ with c2:
                       index_col = "MESSZEITPUNKT"
                       )
 
+
       sns.lineplot(x="MESSZEITPUNKT",y=type, data = series[x], label = x)
-#    st.write(series)
+#    ax.legend()
     plotly_fig = tls.mpl_to_plotly(fig)
+    
     st.plotly_chart(plotly_fig)
 #    st.pyplot(fig)
-
+#    st.write(series)
     
