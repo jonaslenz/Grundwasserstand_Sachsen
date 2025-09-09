@@ -59,7 +59,7 @@ with c1:
   df1 = filter_dataframe(df1)
   event = st.dataframe(
         df1,
-        use_container_width=True,
+        width="stretch",
         on_select="rerun",
         hide_index = True,
         selection_mode="multi-row",
@@ -80,29 +80,29 @@ with c1:
          zoom = 5)
 
 with c2:
-  if len(Auswahl.index) > 250:
-    st.warning("Achtung, zuviel Daten in Darstellung ("+str(len(Auswahl.index)) +"), bitte weniger Messstellen auswählen.")
+  if len(Auswahl.index) > 300:
+    st.warning("Achtung, zuviel Daten in Darstellung ("+str(len(Auswahl.index)) +"), bitte maximal 300 Messstellen auswählen.")
     st.stop()
   if len(Auswahl.index) <= 0:
-    st.warning("Achtung, bitte Messstellen auswählen.")
+    st.warning("Bitte Messstellen auswählen.")
     st.stop()
-  if st.checkbox("Zeige Diagramm"):
-
+  else:
     type = st.radio(label = "type", options = ["WERT_IM_HOEHENSYSTEM", "WERT_UNTER_GELAENDE"])
 
 
     for x in MKZs:
       cacheorload("ExportSN_GWS-Rohdaten_"+x+".csv")
       
-      dateparse = lambda x: datetime.datetime.strptime(x, '%Y-%m-%d')
+      #dateparse = lambda x: datetime.datetime.strptime(x, '%Y-%m-%d')
       
       add = pd.read_csv('./cache/ExportSN_GWS-Rohdaten_'+x+'.csv',
                       sep=';',
                       thousands='.',
                       decimal=',',
-                      parse_dates=["MESSZEITPUNKT"],
-                      date_parser=dateparse,
+       #               parse_dates=["MESSZEITPUNKT"],
+        #              date_parser=dateparse,
                       )
+      add['MESSZEITPUNKT'] = pd.to_datetime(add['MESSZEITPUNKT'], format='%Y-%m-%d')
       try:
         len(alle.index)
       except NameError:
