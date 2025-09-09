@@ -2,14 +2,15 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 import datetime
-import matplotlib.pyplot as plt
-import matplotlib.dates
+#import matplotlib.pyplot as plt
+#import matplotlib.dates
 from urllib.request import urlretrieve
 from pyproj import Transformer
 import os.path
-import seaborn as sns
-import plotly
-import plotly.tools as tls
+#import seaborn as sns
+#import plotly
+#import plotly.tools as tls
+import plotly.express as px
 
 from DF_Filter import filter_dataframe 
 
@@ -82,33 +83,33 @@ with c2:
   if len(Auswahl.index) > 250:
     st.warning("Achtung, zuviel Daten in Darstellung ("+str(len(Auswahl.index)) +"), bitte weniger Messstellen auswählen.")
     st.stop()
+  if len(Auswahl.index) <= 0:
+    st.warning("Achtung, bitte Messstellen auswählen.")
+    st.stop()
   if st.checkbox("Zeige Diagramm"):
+
     type = st.radio(label = "type", options = ["WERT_IM_HOEHENSYSTEM", "WERT_UNTER_GELAENDE"])
-    series = {}
-    
-    fig, ax = plt.subplots()
-    
+
+
     for x in MKZs:
-      # st.write(x)
       cacheorload("ExportSN_GWS-Rohdaten_"+x+".csv")
       
       dateparse = lambda x: datetime.datetime.strptime(x, '%Y-%m-%d')
-
-      series[x] = pd.read_csv('./cache/ExportSN_GWS-Rohdaten_'+x+'.csv',
+      
+      add = pd.read_csv('./cache/ExportSN_GWS-Rohdaten_'+x+'.csv',
                       sep=';',
                       thousands='.',
                       decimal=',',
                       parse_dates=["MESSZEITPUNKT"],
                       date_parser=dateparse,
-                      index_col = "MESSZEITPUNKT"
                       )
+      try:
+        len(alle.index)
+      except NameError:
+        alle = add.copy()
+      else:
+        alle = pd.concat([alle, add])
 
+    fig = px.line(alle, x="MESSZEITPUNKT",y=type, color = "MKZ")
 
-      sns.lineplot(x="MESSZEITPUNKT",y=type, data = series[x], label = x)
-#    ax.legend()
-    plotly_fig = tls.mpl_to_plotly(fig)
-    
-    st.plotly_chart(plotly_fig, on_select = "rerun")
-#    st.pyplot(fig)
-#    st.write(series)
-    
+    st.plotly_chart(fig)
