@@ -11,6 +11,7 @@ import seaborn as sns
 import plotly
 import plotly.tools as tls
 
+from DF_Filter import filter_dataframe 
 
 st.set_page_config(layout="wide")
 
@@ -20,6 +21,8 @@ def cacheorload(filename):
     urlretrieve(url+filename, './cache/'+filename)
   return
 
+############################
+
 
 cacheorload('Export_MKZ_Uebersicht.csv')
 Messstellen = pd.read_csv('./cache/Export_MKZ_Uebersicht.csv',
@@ -27,6 +30,16 @@ Messstellen = pd.read_csv('./cache/Export_MKZ_Uebersicht.csv',
                       thousands='.',
                       decimal=','
                       )
+
+Mess_GWK = pd.read_csv('./MKZ_GWK.csv',
+                      sep=';',
+                      thousands='.',
+                      decimal=',',
+#                      index = "MKZ"
+                      )
+Mess_GWK = Mess_GWK.fillna("na")
+
+Messstellen = Messstellen.merge(Mess_GWK, on = "MKZ")
 
 c1, c2 = st.columns([0.2,0.8])
 
@@ -40,8 +53,9 @@ Messstellen['lon'] = lon
 #st.write(Messstellen.columns.values)
 
 with c1:
-  columns = ['MKZ', 'Erstes_Messdatum', 'Letztes_Messdatum']
+  columns = ['MKZ', 'Erstes_Messdatum', 'Letztes_Messdatum', 'GWK', 'GWK25']
   df1 = pd.DataFrame(Messstellen, columns=columns)
+  df1 = filter_dataframe(df1)
   event = st.dataframe(
         df1,
         use_container_width=True,
@@ -50,18 +64,23 @@ with c1:
         selection_mode="multi-row",
     )
 
-  MKZs = event.selection.rows
+  MKZs_ids = event.selection.rows
+
+  MKZs = df1.loc[MKZs_ids, "MKZ"].tolist()
+  
+  Auswahl = Messstellen[Messstellen['MKZ'].isin(MKZs)]
 
 #  st.write(MKZs)
+#  st.write(Auswahl)
 #  st.write(Messstellen.loc[MKZs, "MKZ"])
-  st.map(data=Messstellen.iloc[MKZs],
+  st.map(data=Auswahl,
          use_container_width=True,
          height=200,
          zoom = 5)
 
 with c2:
-  if len(MKZs) > 15:
-    st.warning("Achtung, zuviel Daten in Darstellung, bitte weniger Messstellen auswählen.")
+  if len(Auswahl.index) > 250:
+    st.warning("Achtung, zuviel Daten in Darstellung ("+str(len(Auswahl.index)) +"), bitte weniger Messstellen auswählen.")
     st.stop()
   if st.checkbox("Zeige Diagramm"):
     type = st.radio(label = "type", options = ["WERT_IM_HOEHENSYSTEM", "WERT_UNTER_GELAENDE"])
@@ -69,7 +88,7 @@ with c2:
     
     fig, ax = plt.subplots()
     
-    for x in Messstellen.loc[MKZs, "MKZ"]:
+    for x in MKZs:
       # st.write(x)
       cacheorload("ExportSN_GWS-Rohdaten_"+x+".csv")
       
@@ -89,7 +108,7 @@ with c2:
 #    ax.legend()
     plotly_fig = tls.mpl_to_plotly(fig)
     
-    st.plotly_chart(plotly_fig)
+    st.plotly_chart(plotly_fig, on_select = "rerun")
 #    st.pyplot(fig)
 #    st.write(series)
     
