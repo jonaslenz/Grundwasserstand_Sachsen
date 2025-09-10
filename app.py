@@ -42,7 +42,7 @@ Mess_GWK = Mess_GWK.fillna("na")
 
 Messstellen = Messstellen.merge(Mess_GWK, on = "MKZ")
 
-c1, c2 = st.columns([0.2,0.8])
+c1, c2 = st.columns([0.3,0.7])
 
 transformer = Transformer.from_crs("EPSG:25833", "EPSG:4326")
 
@@ -54,7 +54,7 @@ Messstellen['lon'] = lon
 #st.write(Messstellen.columns.values)
 
 with c1:
-  columns = ['MKZ', 'Erstes_Messdatum', 'Letztes_Messdatum', 'GWK', 'GWK25']
+  columns = ['MKZ', 'Erstes_Messdatum', 'Letztes_Messdatum', 'GWK', 'GWK25', 'RW_ETRS89', 'HW_ETRS89']
   df1 = pd.DataFrame(Messstellen, columns=columns)
   df1 = filter_dataframe(df1)
   event = st.dataframe(
@@ -110,6 +110,7 @@ with c2:
       else:
         alle = pd.concat([alle, add])
 
-    fig = px.line(alle, x="MESSZEITPUNKT",y=type, color = "MKZ")
+    fig = px.line(alle, x="MESSZEITPUNKT",y=type, color = "MKZ", height=600)
 
     st.plotly_chart(fig)
+
