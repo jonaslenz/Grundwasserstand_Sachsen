@@ -54,7 +54,7 @@ Messstellen['lon'] = lon
 #st.write(Messstellen.columns.values)
 
 with c1:
-  columns = ['MKZ', 'Erstes_Messdatum', 'Letztes_Messdatum', 'GWK', 'GWK25', 'RW_ETRS89', 'HW_ETRS89']
+  columns = ['MKZ', 'Erstes_Messdatum', 'Letztes_Messdatum', 'GWK', 'GWK25', 'WRRL, 'RW_ETRS89', 'HW_ETRS89']
   df1 = pd.DataFrame(Messstellen, columns=columns)
   df1 = filter_dataframe(df1)
   event = st.dataframe(
@@ -113,4 +113,5 @@ with c2:
     fig = px.line(alle, x="MESSZEITPUNKT",y=type, color = "MKZ", height=600)
 
     st.plotly_chart(fig)
+
 
