@@ -33,9 +33,9 @@ Messstellen = pd.read_csv('./cache/Export_MKZ_Uebersicht.csv',
                       )
 
 Mess_GWK = pd.read_csv('./MKZ_GWK.csv',
-                      sep=';',
-                      thousands='.',
-                      decimal=',',
+#                      sep=';',
+#                      thousands='.',
+#                      decimal=',',
 #                      index = "MKZ"
                       )
 Mess_GWK = Mess_GWK.fillna("na")
@@ -112,17 +112,15 @@ with c2:
 
     fig = px.line(alle, x="MESSZEITPUNKT",y=type, color = "MKZ", height=600)
 
+#    st.write(Auswahl)
     if filterlage == "zeichne FIlterlage":
-      for allex in Auswahl:
-        fig.add_patch(Rectangle(
-          (alle.loc(alle['MKZ'==allex]).['MESSZEITPUNKT'].min(),
-          Messstellen[Messstellen['FL_U'].isin(allex)],
-          ),   # lower left
-          alle.loc(alle['MKZ'==allex]).['MESSZEITPUNKT'].max() - alle.loc(alle['MKZ'==allex]).['MESSZEITPUNKT'].min(),   # delta to rigth
-          Messstellen[Messstellen['FL_O'].isin(allex)] - Messstellen[Messstellen['FL_U'].isin(allex)], delta to lower
-
-               fill=False,
-               lw=1))
+      for allex in MKZs:
+#        st.write(allex)
+        st.write(Auswahl[Auswahl['MKZ']==allex]['FL_U'].item())
+#        st.write(Auswahl[Auswahl['MKZ']==allex]['FL_O'].item())
+        fig.add_hrect(y0=Auswahl[Auswahl['MKZ']==allex]['FL_U'].item(),
+                      y1=Auswahl[Auswahl['MKZ']==allex]['FL_O'].item(),
+                      line_width=1, fillcolor="red")
 
     st.plotly_chart(fig)
 
