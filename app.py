@@ -88,7 +88,7 @@ with c2:
     st.stop()
   else:
     type = st.radio(label = "type", options = ["WERT_IM_HOEHENSYSTEM", "WERT_UNTER_GELAENDE"])
-
+    filterlage = st.radio(label = "filterlage", options = ["Keine Filterlage", "zeichne FIlterlage"])
 
     for x in MKZs:
       cacheorload("ExportSN_GWS-Rohdaten_"+x+".csv")
@@ -112,7 +112,19 @@ with c2:
 
     fig = px.line(alle, x="MESSZEITPUNKT",y=type, color = "MKZ", height=600)
 
+    if filterlage == "zeichne FIlterlage":
+      for allex in Auswahl:
+        fig.add_patch(Rectangle(
+          (Messstellen[Messstellen['FL_U'].isin(allex)], 1),   # lower left
+          Messstellen[Messstellen['FL_U'].isin(alle)] + Messstellen[Messstellen['FL_O'].isin(allex)],
+          6,
+               edgecolor = 'pink',
+               facecolor = 'blue',
+               fill=True,
+               lw=5))
+
     st.plotly_chart(fig)
+
 
 
 
