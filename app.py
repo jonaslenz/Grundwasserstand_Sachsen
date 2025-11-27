@@ -112,7 +112,9 @@ with c2:
 
     fig = px.line(alle, x="MESSZEITPUNKT",y=type, color = "MKZ", height=600)
 
-    st.plotly_chart(fig)
+    if type == "WERT_UNTER_GELAENDE":
+      fig['layout']['yaxis']['autorange'] = "reversed"
 
+    st.plotly_chart(fig)
 
 
