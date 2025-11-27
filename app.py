@@ -88,7 +88,6 @@ with c2:
     st.stop()
   else:
     type = st.radio(label = "type", options = ["WERT_IM_HOEHENSYSTEM", "WERT_UNTER_GELAENDE"])
-    filterlage = st.radio(label = "filterlage", options = ["Keine Filterlage", "zeichne FIlterlage"])
 
     for x in MKZs:
       cacheorload("ExportSN_GWS-Rohdaten_"+x+".csv")
@@ -112,19 +111,16 @@ with c2:
 
     fig = px.line(alle, x="MESSZEITPUNKT",y=type, color = "MKZ", height=600)
 
-#    st.write(Auswahl)
-    if filterlage == "zeichne FIlterlage":
-      for allex in MKZs:
-#        st.write(allex)
-        st.write(Auswahl[Auswahl['MKZ']==allex]['FL_U'].item())
-#        st.write(Auswahl[Auswahl['MKZ']==allex]['FL_O'].item())
-        fig.add_hrect(y0=Auswahl[Auswahl['MKZ']==allex]['FL_U'].item(),
-                      y1=Auswahl[Auswahl['MKZ']==allex]['FL_O'].item(),
-                      line_width=1, fillcolor="red")
-
 
     if type == "WERT_UNTER_GELAENDE":
       fig['layout']['yaxis']['autorange'] = "reversed"
+
+      if st.checkbox("zeichne Filterlage"):
+        for allex in MKZs:
+          fig.add_hrect(y0=Auswahl[Auswahl['MKZ']==allex]['FL_U'].item(),
+                        y1=Auswahl[Auswahl['MKZ']==allex]['FL_O'].item(),
+                        line_width=1)
+
 
     st.plotly_chart(fig)
 
