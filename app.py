@@ -122,9 +122,9 @@ with c2:
                       y1=Auswahl[Auswahl['MKZ']==allex]['FL_O'].item(),
                       line_width=1, fillcolor="red")
 
+
+    if type == "WERT_UNTER_GELAENDE":
+      fig['layout']['yaxis']['autorange'] = "reversed"
+
     st.plotly_chart(fig)
-
-
-
-
 
