@@ -115,15 +115,17 @@ with c2:
     if filterlage == "zeichne FIlterlage":
       for allex in Auswahl:
         fig.add_patch(Rectangle(
-          (Messstellen[Messstellen['FL_U'].isin(allex)], 1),   # lower left
-          Messstellen[Messstellen['FL_U'].isin(alle)] + Messstellen[Messstellen['FL_O'].isin(allex)],
-          6,
-               edgecolor = 'pink',
-               facecolor = 'blue',
-               fill=True,
-               lw=5))
+          (alle.loc(alle['MKZ'==allex]).['MESSZEITPUNKT'].min(),
+          Messstellen[Messstellen['FL_U'].isin(allex)],
+          ),   # lower left
+          alle.loc(alle['MKZ'==allex]).['MESSZEITPUNKT'].max() - alle.loc(alle['MKZ'==allex]).['MESSZEITPUNKT'].min(),   # delta to rigth
+          Messstellen[Messstellen['FL_O'].isin(allex)] - Messstellen[Messstellen['FL_U'].isin(allex)], delta to lower
+
+               fill=False,
+               lw=1))
 
     st.plotly_chart(fig)
+
 
 
 
