@@ -1,7 +1,6 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
-import datetime
 #import matplotlib.pyplot as plt
 #import matplotlib.dates
 from urllib.request import urlretrieve
@@ -12,7 +11,6 @@ import os.path
 #import plotly.tools as tls
 import plotly.express as px
 from sklearn import linear_model
-import csv
 
 from DF_Filter import filter_dataframe 
 
@@ -96,7 +94,9 @@ with c2:
     st.warning("Bitte Messstellen auswählen.")
     st.stop()
   else:
-    type = st.radio(label = "type", options = ["WERT_IM_HOEHENSYSTEM", "WERT_UNTER_GELAENDE"])
+    type = st.radio(label = "type",
+                    options = ["WERT_IM_HOEHENSYSTEM", "WERT_UNTER_GELAENDE"],
+                    horizontal = True)
 
 # MKZs = Messstellen.iloc[1:5,].loc[:,"MKZ"].tolist() # Auswahl Messstellen auserhalb Streamlit
     for x in MKZs:
