@@ -64,27 +64,29 @@ with c1:
   columns = ['MKZ', 'Erstes_Messdatum', 'Letztes_Messdatum', 'GWK', 'GWK25', 'WRRL', 'RW_ETRS89', 'HW_ETRS89', 'Trend']
   df1 = pd.DataFrame(Messstellen, columns=columns)
   df1 = filter_dataframe(df1)
-  event = st.dataframe(
-        df1,
-        width="stretch",
-        on_select="rerun",
-        hide_index = True,
-        selection_mode="multi-row",
-    )
-
-  MKZs_ids = event.selection.rows
+  with st.expander("Auswahliste", expanded=True):
+      event = st.dataframe(
+            df1,
+            width="stretch",
+            on_select="rerun",
+            hide_index = True,
+            selection_mode="multi-row",
+        )
+    
+      MKZs_ids = event.selection.rows
 
   MKZs = df1.loc[MKZs_ids, "MKZ"].tolist()
-  
   Auswahl = Messstellen[Messstellen['MKZ'].isin(MKZs)]
 
 #  st.write(MKZs)
 #  st.write(Auswahl)
 #  st.write(Messstellen.loc[MKZs, "MKZ"])
-  st.map(data=Auswahl,
-         use_container_width=True,
-         height=200,
-         zoom = 5)
+  c1c1, c1c2 = st.columns([0.5,0.5])
+  with c1c1:
+      st.map(data=Auswahl,
+             use_container_width=True,
+             height=200,
+             zoom = 5)
 
 with c2:
   if len(Auswahl.index) > 300:
@@ -152,18 +154,33 @@ with c2:
                 continue
 #            if 
 
-            x = (add.index - add.index[0]).days.values.reshape(-1, 1) / 365
-            y = add.values
+# Lineare Regression
+            x = (add.index - add.index[0]).days.values.reshape(-1, 1) / 365 # /365 ändert die Zeitwerte von Tag auf Jahr
+            y = add.values                                                  # Die WERT_UNTER_GELAENDE Werte sind in cm
             a = linear_model.LinearRegression().fit(x, y)
             linear_model.LinearRegression(copy_X=True, fit_intercept=True, n_jobs=1)
 
-            y_pred = a.predict([[x.min()],[x.max()]])
+#            import matplotlib.pyplot as plt
+#            y_pred = a.predict([[x.min()],[x.max()]])
 #            plt.plot(x,y)
 #            plt.plot([x.min(),x.max()],y_pred)
 #            plt.text(0,y.min(), a.coef_)
 #            plt.show()
-            Mess_GWK.loc[(Mess_GWK["MKZ"]==z, "Trend")] = -a.coef_
 
-    st.write("Trendberechnung beendet.")
-    Mess_GWK.loc[:,("MKZ","Trend")].to_csv('./MKZ_Trend.csv',
-                                           index = False)
+# Berechnung Grimm Strele Trend
+            Messstellen.loc[(Messstellen["MKZ"]==z, "Trend")] = -a.coef_ / (y.max()-y.min()) *100 # Anstieg in cm/a / Spannweite der cm --> Grimm-Strele Test
+
+    Messstellen.loc[:,("MKZ","Trend")].to_csv('./MKZ_Trend.csv',
+                                               index = False)
+#    st.write("Trendberechnung beendet.")
+
+#    Darstellung Histogram und Prozent
+with c1c2:
+    trends = Messstellen["Trend"].copy()
+    trends = trends.dropna()
+    fig2 = px.histogram(Messstellen, x="Trend", height=250)
+    st.plotly_chart(fig2)
+    if trends.shape[0]>=1:
+        st.write("Anteil negativer Trend: "+
+                 str(len(trends[trends<=-2]) / len(trends) * 100)+
+                 "%.")
