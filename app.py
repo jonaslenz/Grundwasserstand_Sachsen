@@ -11,6 +11,8 @@ import os.path
 #import plotly
 #import plotly.tools as tls
 import plotly.express as px
+from sklearn import linear_model
+import csv
 
 from DF_Filter import filter_dataframe 
 
@@ -40,9 +42,13 @@ Mess_GWK = pd.read_csv('./MKZ_GWK.csv',
                       )
 Mess_GWK = Mess_GWK.fillna("na")
 
-Messstellen = Messstellen.merge(Mess_GWK, on = "MKZ")
+if not os.path.isfile('./MKZ_Trend.csv'):
+    Mess_GWK["Trend"] = np.nan
+else:
+    Mess_Trend = pd.read_csv('./MKZ_Trend.csv')
+    Mess_GWK = Mess_GWK.merge(Mess_Trend, on = "MKZ")
 
-c1, c2 = st.columns([0.3,0.7])
+Messstellen = Messstellen.merge(Mess_GWK, on = "MKZ")
 
 transformer = Transformer.from_crs("EPSG:25833", "EPSG:4326")
 
@@ -51,10 +57,13 @@ lat, lon = transformer.transform(Messstellen.RW_ETRS89, Messstellen.HW_ETRS89)
 Messstellen['lat'] = lat
 Messstellen['lon'] = lon
 
+del lat, lon
+
 #st.write(Messstellen.columns.values)
+c1, c2 = st.columns([0.5,0.5])
 
 with c1:
-  columns = ['MKZ', 'Erstes_Messdatum', 'Letztes_Messdatum', 'GWK', 'GWK25', 'WRRL', 'RW_ETRS89', 'HW_ETRS89']
+  columns = ['MKZ', 'Erstes_Messdatum', 'Letztes_Messdatum', 'GWK', 'GWK25', 'WRRL', 'RW_ETRS89', 'HW_ETRS89', 'Trend']
   df1 = pd.DataFrame(Messstellen, columns=columns)
   df1 = filter_dataframe(df1)
   event = st.dataframe(
@@ -89,12 +98,12 @@ with c2:
   else:
     type = st.radio(label = "type", options = ["WERT_IM_HOEHENSYSTEM", "WERT_UNTER_GELAENDE"])
 
-
+# MKZs = Messstellen.iloc[1:5,].loc[:,"MKZ"].tolist() # Auswahl Messstellen auserhalb Streamlit
     for x in MKZs:
       cacheorload("ExportSN_GWS-Rohdaten_"+x+".csv")
-      
+
       #dateparse = lambda x: datetime.datetime.strptime(x, '%Y-%m-%d')
-      
+
       add = pd.read_csv('./cache/ExportSN_GWS-Rohdaten_'+x+'.csv',
                       sep=';',
                       thousands='.',
@@ -117,4 +126,44 @@ with c2:
 
     st.plotly_chart(fig)
 
+# Trendberechnung
+    first_notice = True
+    for z in MKZs:
+        if pd.isna(Messstellen.loc[(Messstellen["MKZ"]==z, "Trend")]).values[0]:
+        # if pd.isna(Messstellen["Trend"][Messstellen["MKZ"]==z]).values[0]:
+            if first_notice:
+                st.write("Trendberechnung erfolgt für "+str(len(MKZs))+" Messstellen ab Zeitraum 1995.")
+                first_notice = False
+    # Laden der Datenreihe
+            add = pd.read_csv('./cache/ExportSN_GWS-Rohdaten_'+z+'.csv',
+                              sep=';',
+                              thousands='.',
+                              decimal=',',
+             #               parse_dates=["MESSZEITPUNKT"],
+             #              date_parser=dateparse,
+             )
+            add['MESSZEITPUNKT'] = pd.to_datetime(add['MESSZEITPUNKT'], format='%Y-%m-%d')
+            add = add.set_index('MESSZEITPUNKT')
+            add = add.loc[:,"WERT_UNTER_GELAENDE"]
+            add = add.dropna()
+            add = add.loc[add.index>="1995"]
+            if(add.shape[0]<=0):
+                st.warning("fail on "+z)
+                continue
+#            if 
 
+            x = (add.index - add.index[0]).days.values.reshape(-1, 1) / 365
+            y = add.values
+            a = linear_model.LinearRegression().fit(x, y)
+            linear_model.LinearRegression(copy_X=True, fit_intercept=True, n_jobs=1)
+
+            y_pred = a.predict([[x.min()],[x.max()]])
+#            plt.plot(x,y)
+#            plt.plot([x.min(),x.max()],y_pred)
+#            plt.text(0,y.min(), a.coef_)
+#            plt.show()
+            Mess_GWK.loc[(Mess_GWK["MKZ"]==z, "Trend")] = -a.coef_
+
+    st.write("Trendberechnung beendet.")
+    Mess_GWK.loc[:,("MKZ","Trend")].to_csv('./MKZ_Trend.csv',
+                                           index = False)
