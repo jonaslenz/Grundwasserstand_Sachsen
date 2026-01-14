@@ -255,3 +255,17 @@ with c2:
                                    "_End"+str(Enddatum)+
                                    "_Min"+str(Mindatum)+
                                    ".csv")
+with c1:
+    import os
+    import glob
+#    files = os.listdir()
+    files = glob.glob('Trend*')
+    if(len(files) >0):
+        filename = st.radio("Wähle Trendanalyse aus", options = files)
+        with open(filename, "rb") as file:
+            st.download_button(
+                label="Download",
+                data=file,
+                file_name=filename,
+                mime="text/csv"
+    )
