@@ -161,7 +161,8 @@ with c2:
                     if runtrendall:
                         if (counter % 100) == 0:
                             st.write(str(counter+ " von "+str(len(MKZs))+" bearbeitet."))
-                                   
+                        counter += 1
+
                     if ((Messstellen.loc[
                             Messstellen["MKZ"]==z, "Letztes_Messdatum"] <
                             pd.to_datetime(Enddatum)).values[0]):
@@ -268,4 +269,5 @@ with c1:
                 file_name=filename,
                 mime="text/csv"
     )
+
 
