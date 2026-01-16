@@ -100,6 +100,7 @@ with c1:
           )
       if st.button("Datei löschen"):
           os.remove(filename)
+          st.rerun()
 
 with c2:
   if len(Auswahl.index) > 300:
@@ -281,10 +282,5 @@ with c2:
                                      "_End"+str(Enddatum)+
                                      "_Min"+str(Mindatum)+
                                      ".xlsx")
-
-
-
-
-
-
+                st.rerun()
 
