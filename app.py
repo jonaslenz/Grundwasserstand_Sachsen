@@ -83,7 +83,7 @@ with c1:
 #  st.write(Auswahl)
 #  st.write(Messstellen.loc[MKZs, "MKZ"])
   st.map(data=Auswahl,
-             use_container_width=True,
+             width="stretch",
              height=200,
              zoom = 5)
 
@@ -278,6 +278,7 @@ with c2:
                                      "_End"+str(Enddatum)+
                                      "_Min"+str(Mindatum)+
                                      ".xlsx")
+
 
 
 
