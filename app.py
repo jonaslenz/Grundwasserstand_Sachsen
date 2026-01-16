@@ -174,7 +174,7 @@ with c2:
                     if runtrendall:
                         if (counter % 10) == 0:
                           percent_complete = counter / len(MKZs)
-                          my_bar.progress(percent_complete + 1, text="Bearbeitungsfortschritt")
+                          my_bar.progress(percent_complete, text="Bearbeitungsfortschritt")
                         counter += 1
 
                     if ((Messstellen.loc[
@@ -278,5 +278,6 @@ with c2:
                                      "_End"+str(Enddatum)+
                                      "_Min"+str(Mindatum)+
                                      ".xlsx")
+
 
 
