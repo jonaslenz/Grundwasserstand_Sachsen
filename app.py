@@ -98,7 +98,7 @@ with c1:
                 file_name=filename,
                 mime="text/csv"
     )
-    with st.button("Datei löschen"):
+    if st.button("Datei löschen"):
         os.remove(filename)
 
 with c2:
@@ -281,6 +281,7 @@ with c2:
                                      "_End"+str(Enddatum)+
                                      "_Min"+str(Mindatum)+
                                      ".xlsx")
+
 
 
 
