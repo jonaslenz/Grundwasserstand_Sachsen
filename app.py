@@ -165,7 +165,7 @@ with c2:
             if runtrendall:
                 MKZs = Messstellen["MKZ"]
                 counter = 1
-                my_bar = st.progress(0., text="BEarbeitungsfortschritt")
+                my_bar = st.progress(0., text="Bearbeitungsfortschritt")
             for z in MKZs:
                 if pd.isna(Messstellen.loc[(Messstellen["MKZ"]==z, "Trend")]).values[0]:
                     if first_notice:
@@ -174,7 +174,7 @@ with c2:
                     if runtrendall:
                         if (counter % 10) == 0:
                           percent_complete = counter / len(MKZs)
-                          my_bar.progress(percent_complete + 1, text=progress_text)
+                          my_bar.progress(percent_complete + 1, text="Bearbeitungsfortschritt")
                         counter += 1
 
                     if ((Messstellen.loc[
@@ -278,4 +278,5 @@ with c2:
                                      "_End"+str(Enddatum)+
                                      "_Min"+str(Mindatum)+
                                      ".xlsx")
+
 
