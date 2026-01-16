@@ -97,9 +97,9 @@ with c1:
                 data=file,
                 file_name=filename,
                 mime="text/csv"
-    )
-    if st.button("Datei löschen"):
-        os.remove(filename)
+          )
+      if st.button("Datei löschen"):
+          os.remove(filename)
 
 with c2:
   if len(Auswahl.index) > 300:
@@ -281,6 +281,7 @@ with c2:
                                      "_End"+str(Enddatum)+
                                      "_Min"+str(Mindatum)+
                                      ".xlsx")
+
 
 
 
