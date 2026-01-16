@@ -155,10 +155,12 @@ with c2:
                 counter = 1
             for z in MKZs:
                 if pd.isna(Messstellen.loc[(Messstellen["MKZ"]==z, "Trend")]).values[0]:
-                # if pd.isna(Messstellen["Trend"][Messstellen["MKZ"]==z]).values[0]:
                     if first_notice:
                         st.write("Versuche Trendberechnung für "+str(len(MKZs))+" Messstellen seit "+str(Startdatum)+".")
                         first_notice = False
+                    if runtrendall:
+                        if (counter % 100) == 0:
+                            st.write(str(counter+ " von "+str(len(MKZs))+" bearbeitet."))
                                    
                     if ((Messstellen.loc[
                             Messstellen["MKZ"]==z, "Letztes_Messdatum"] <
@@ -198,9 +200,6 @@ with c2:
                     a = linear_model.LinearRegression().fit(x, y)
                     linear_model.LinearRegression(copy_X=True, fit_intercept=True, n_jobs=1)
     
-                    if runtrendall:
-                        if counter % 100 == 0:
-                            st.write(str(counter+ " von "+str(len(MKZs))+" bearbeitet."))
                     if runtrend:
                         
             #            import matplotlib.pyplot as plt
@@ -269,3 +268,4 @@ with c1:
                 file_name=filename,
                 mime="text/csv"
     )
+
