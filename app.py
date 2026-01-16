@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 import datetime
+import glob
 #import matplotlib.pyplot as plt
 #import matplotlib.dates
 from urllib.request import urlretrieve
@@ -85,6 +86,17 @@ with c1:
              use_container_width=True,
              height=200,
              zoom = 5)
+
+  files = glob.glob('Trend*')
+  if(len(files) >0):
+      filename = st.radio("Trendanalyse über alle MKZ zum Download", options = files)
+      with open(filename, "rb") as file:
+          st.download_button(
+                label="Download",
+                data=file,
+                file_name=filename,
+                mime="text/csv"
+    )
 
 with c2:
   if len(Auswahl.index) > 300:
@@ -202,10 +214,8 @@ with c2:
                     linear_model.LinearRegression(copy_X=True, fit_intercept=True, n_jobs=1)
     
                     if runtrend:
-                        
-            #            import matplotlib.pyplot as plt
+                        # Hinzufügen der Regressionsgeraden zu dataframe mit allen Messstellenwerten
                         pred = alle.iloc[0:2,].copy()
-            #            st.write(pred)
                         pred.loc[0,"MKZ"] = z
                         pred.loc[0,"MESSZEITPUNKT"] = add.index[0]
                         pred.loc[0,"WERT_UNTER_GELAENDE"] = a.predict([[x.min()]])[0]
@@ -215,7 +225,6 @@ with c2:
                         pred.loc[1,"MESSZEITPUNKT"] = add.index[-1]
                         pred.loc[1,"WERT_UNTER_GELAENDE"] = a.predict([[x.max()]])[0]
                         pred.loc[1,"pred"] = True
-            #            st.write(pred)
         
                         alle = pd.concat([alle, pred])
                     
@@ -224,7 +233,7 @@ with c2:
             #            plt.text(0,y.min(), a.coef_)
             #            plt.show()
     
-        # Berechnung Grimm Strele Trend
+        # Berechnung Grimm Strele Trendwerte und Anfügen an Dataframe
                     Messstellen.loc[(Messstellen["MKZ"]==z, "Trend Grimm Strele")] = -a.coef_ / (y.max()-y.min()) *100 # Anstieg in cm/a / Spannweite der cm --> Grimm-Strele Test
                     Messstellen.loc[(Messstellen["MKZ"]==z, "Anstieg Regression")] = -a.coef_  # Anstieg in cm/a
                     Messstellen.loc[(Messstellen["MKZ"]==z, "Spanne")] = y.max()-y.min() # Spannweite der cm
@@ -250,25 +259,12 @@ with c2:
 
             if runtrendall:
                 Messstellen.to_csv("Trendanalyse_"+
-                                   datetime.datetime.now().strftime("%Y%m%d_%H%M")+
-                                   "_Start"+str(Startdatum)+
-                                   "_End"+str(Enddatum)+
-                                   "_Min"+str(Mindatum)+
-                                   ".csv")
-with c1:
-    import os
-    import glob
-#    files = os.listdir()
-    files = glob.glob('Trend*')
-    if(len(files) >0):
-        filename = st.radio("Wähle Trendanalyse aus", options = files)
-        with open(filename, "rb") as file:
-            st.download_button(
-                label="Download",
-                data=file,
-                file_name=filename,
-                mime="text/csv"
-    )
-
-
-
+                                     datetime.datetime.now().strftime("%Y%m%d_%H%M")+
+                                     "_Start"+str(Startdatum)+
+                                     "_End"+str(Enddatum)+
+                                     "_Min"+str(Mindatum)+
+                                     ".csv",
+                                   index = False,
+                                   sep = ";",
+                                   dec = ","
+                                  )
