@@ -165,14 +165,16 @@ with c2:
             if runtrendall:
                 MKZs = Messstellen["MKZ"]
                 counter = 1
+                my_bar = st.progress(0., text="BEarbeitungsfortschritt")
             for z in MKZs:
                 if pd.isna(Messstellen.loc[(Messstellen["MKZ"]==z, "Trend")]).values[0]:
                     if first_notice:
                         st.write("Versuche Trendberechnung für "+str(len(MKZs))+" Messstellen seit "+str(Startdatum)+".")
                         first_notice = False
                     if runtrendall:
-                        if (counter % 100) == 0:
-                            st.write(str(counter) + " von "+str(len(MKZs))+" bearbeitet.")
+                        if (counter % 10) == 0:
+                          percent_complete = counter / len(MKZs)
+                          my_bar.progress(percent_complete + 1, text=progress_text)
                         counter += 1
 
                     if ((Messstellen.loc[
@@ -266,5 +268,14 @@ with c2:
                                      ".csv",
                                    index = False,
                                    sep = ";",
-                                   dec = ","
+                                   decimal = ","
                                   )
+                my_bar.empty()
+                st.write("Tabelle zum Download bereit.")
+                Messstellen.to_excel("Trendanalyse_"+
+                                     datetime.datetime.now().strftime("%Y%m%d_%H%M")+
+                                     "_Start"+str(Startdatum)+
+                                     "_End"+str(Enddatum)+
+                                     "_Min"+str(Mindatum)+
+                                     ".xlsx")
+
