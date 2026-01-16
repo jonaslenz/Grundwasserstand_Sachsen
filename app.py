@@ -87,6 +87,7 @@ with c1:
              height=200,
              zoom = 5)
 
+  ## Download / Löschen schon durchgeführter Trendanalysen
   files = glob.glob('Trend*')
   if(len(files) >0):
       filename = st.radio("Trendanalyse über alle MKZ zum Download", options = files)
@@ -97,6 +98,8 @@ with c1:
                 file_name=filename,
                 mime="text/csv"
     )
+    with st.button("Datei löschen"):
+        os.remove(filename)
 
 with c2:
   if len(Auswahl.index) > 300:
@@ -278,6 +281,7 @@ with c2:
                                      "_End"+str(Enddatum)+
                                      "_Min"+str(Mindatum)+
                                      ".xlsx")
+
 
 
 
