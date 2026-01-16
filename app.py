@@ -160,7 +160,7 @@ with c2:
                         first_notice = False
                     if runtrendall:
                         if (counter % 100) == 0:
-                            st.write(str(counter+ " von "+str(len(MKZs))+" bearbeitet."))
+                            st.write(str(counter) + " von "+str(len(MKZs))+" bearbeitet.")
                         counter += 1
 
                     if ((Messstellen.loc[
@@ -269,5 +269,6 @@ with c1:
                 file_name=filename,
                 mime="text/csv"
     )
+
 
 
