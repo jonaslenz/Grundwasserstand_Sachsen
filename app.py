@@ -142,7 +142,7 @@ with c2:
           fig['layout']['yaxis']['autorange'] = "reversed"
     
         st.plotly_chart(fig)
-        alle["pred"] = False
+        alle["pred"] = "Messung"
     #    st.write(alle.head())
 
 # Trendberechnung
@@ -231,7 +231,7 @@ with c2:
                 a = linear_model.LinearRegression().fit(x, y)
                 linear_model.LinearRegression(copy_X=True, fit_intercept=True, n_jobs=1)
 
-    
+
         # Berechnung Grimm Strele Trendwerte und Anfügen an Dataframe
                 Messstellen.loc[(Messstellen["MKZ"]==z, "Trend Grimm Strele")] = -a.coef_ / (y.max()-y.min()) *100 # Anstieg in cm/a / Spannweite der cm --> Grimm-Strele Test
                 Messstellen.loc[(Messstellen["MKZ"]==z, "Anstieg Regression")] = -a.coef_  # Anstieg in cm/a
@@ -247,12 +247,12 @@ with c2:
                     pred.loc[0,"MKZ"] = z
                     pred.loc[0,"MESSZEITPUNKT"] = add.index[0]
                     pred.loc[0,"WERT_UNTER_GELAENDE"] = a.predict([[x.min()]])[0]
-                    pred.loc[0,"pred"] = True
+                    pred.loc[0,"pred"] = "Trend"
 
                     pred.loc[1,"MKZ"] = z
                     pred.loc[1,"MESSZEITPUNKT"] = add.index[-1]
                     pred.loc[1,"WERT_UNTER_GELAENDE"] = a.predict([[x.max()]])[0]
-                    pred.loc[1,"pred"] = True
+                    pred.loc[1,"pred"] = "Trend"
 
                     alle = pd.concat([alle, pred])
 
@@ -262,7 +262,13 @@ with c2:
             #        plt.show()
 
         if runtrend:
-            fig = px.line(alle, x="MESSZEITPUNKT",y="WERT_UNTER_GELAENDE", color = "MKZ", height=500)
+            fig = px.line(alle,
+                          x="MESSZEITPUNKT",
+                          y="WERT_UNTER_GELAENDE",
+                          line_dash = "pred",
+                          color = "MKZ",
+                          height=500
+                          )
             fig['layout']['yaxis']['autorange'] = "reversed"
             st.plotly_chart(fig)
     
