@@ -38,6 +38,7 @@ Mess_GWK = pd.read_csv('./MKZ_GWK.csv',
                       sep=';',
                       thousands='.',
                       decimal=',',
+                      na_values = 'NA',
 #                      index = "MKZ"
                       )
 Mess_GWK = Mess_GWK.fillna("na")
@@ -317,3 +318,4 @@ with c2:
             my_bar.empty()
             st.write("Tabelle zum Download bereit.")
             st.rerun()
+
