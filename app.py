@@ -43,7 +43,7 @@ Mess_GWK = pd.read_csv('./MKZ_GWK.csv',
 Mess_GWK = Mess_GWK.fillna("na")
 
 
-Messstellen = Messstellen.merge(Mess_GWK, on = "MKZ")
+Messstellen = Messstellen.merge(Mess_GWK, on = "MKZ", how = "outer")
 
 Messstellen['Erstes_Messdatum'] = pd.to_datetime(Messstellen['Erstes_Messdatum'], format='%Y-%m-%d')
 Messstellen['Letztes_Messdatum'] = pd.to_datetime(Messstellen['Letztes_Messdatum'], format='%Y-%m-%d')
@@ -60,8 +60,11 @@ del lat, lon
 c1, c2 = st.columns([0.4,0.6])
 
 with c1:
-  columns = ['MKZ', 'Erstes_Messdatum', 'Letztes_Messdatum', 'GWK', 'GWK25', 'RW_ETRS89', 'HW_ETRS89']
+  columns = ['MKZ', 'Erstes_Messdatum', 'Letztes_Messdatum',
+             'GWK', 'GWK25', 'RW_ETRS89', 'HW_ETRS89',
+             'MESSSTELLENART_ID', 'Netzart']
   df1 = pd.DataFrame(Messstellen, columns=columns)
+  df1 = df1.fillna(-42)
   df1 = filter_dataframe(df1)
   with st.expander("Auswahliste", expanded=True):
       event = st.dataframe(
@@ -78,6 +81,13 @@ with c1:
   Auswahl = Messstellen[Messstellen['MKZ'].isin(MKZs)]
   st.write("ausgewählt sind: "+
            str(len(Auswahl))+" Messstellen.")
+  if len(Auswahl) > 0:
+    st.write("Davon sind laut Styx "+
+           str(len(Auswahl[Auswahl['GRIMM-STRELE'] <= -1]))+" fallend ("+
+           str(round(len(
+             Auswahl[Auswahl['GRIMM-STRELE'] <= -1])/len(Auswahl)*100))+"%).")
+    with st.expander("fallende MKZS", expanded = False):
+      Auswahl.MKZ[Auswahl['GRIMM-STRELE'] <= -1]
 
 #  st.write(MKZs)
 #  st.write(Auswahl)
@@ -86,6 +96,7 @@ with c1:
              width="stretch",
              height=200,
              zoom = 5)
+
 
   ## Download / Löschen schon durchgeführter Trendanalysen
   files = glob.glob('Trend*')
@@ -115,7 +126,7 @@ with c2:
                     horizontal = True)
 
 # MKZs = Messstellen.iloc[1:5,].loc[:,"MKZ"].tolist() # Auswahl Messstellen auserhalb Streamlit
-    with st.expander("Gangliniendarstellung", expanded=True):
+    with st.expander("Gangliniendarstellung mit allen Messzeitpunkten", expanded=True):
         for x in MKZs:
           cacheorload("ExportSN_GWS-Rohdaten_"+x+".csv")
     
@@ -129,6 +140,8 @@ with c2:
             #              date_parser=dateparse,
                           )
           add['MESSZEITPUNKT'] = pd.to_datetime(add['MESSZEITPUNKT'], format='%Y-%m-%d')
+          add['WERT_UNTER_GELAENDE'] = add['WERT_UNTER_GELAENDE'].astype('Float64')
+          add['MKZ'] = add['MKZ'].astype('string')
           try:
             len(alle.index)
           except NameError:
@@ -142,21 +155,21 @@ with c2:
           fig['layout']['yaxis']['autorange'] = "reversed"
     
         st.plotly_chart(fig)
-        alle["pred"] = False
+        alle["pred"] = "Messung"
     #    st.write(alle.head())
 
 # Trendberechnung
-    with st.expander("Trendberechnung", expanded=False):
+    with st.expander("Trendberechnung - monatliche Mittelwerte", expanded=False):
         c2c1, c2c2, c2c3 = st.columns([0.4,0.4,0.2])
         with c2c1:
             st.write("Filter für Messstellen")
             Mindatum = st.date_input("Daten müssen seit mindestens vorliegen:",
-                                 value = datetime.date(2011, 1, 1),
+                                 value = datetime.date(2010, 1, 1),
                                  min_value = datetime.date(1930, 1, 1),
                                  max_value = "today")
             
             Enddatum = st.date_input("Daten müssen bis mindestens vorliegen:",
-                                 value = datetime.date(2024, 1, 1),
+                                 value = datetime.date(2023, 12, 31),
                                  min_value = datetime.date(1930, 1, 1),
                                  max_value = "today")
         # TrendAb = datetime.date(1995, 1, 1)
@@ -168,7 +181,7 @@ with c2:
                                    min_value = datetime.date(1930, 1, 1),
                                    max_value = "today")
             TrendBis = st.date_input("Trend bis:",
-                                   value = "today",
+                                   value = datetime.date(2025, 12, 31),
                                    min_value = datetime.date(1930, 1, 1),
                                    max_value = "today")
         with c2c3:    
@@ -211,13 +224,14 @@ with c2:
                                      sep=';',
                                      thousands='.',
                                      decimal=',',
-                     #              parse_dates=["MESSZEITPUNKT"],
-                     #             date_parser=dateparse,
                      )
+                add['WERT_UNTER_GELAENDE'] = add['WERT_UNTER_GELAENDE'].astype('Float64')
                 add['MESSZEITPUNKT'] = pd.to_datetime(add['MESSZEITPUNKT'], format='%Y-%m-%d')
                 add = add.set_index('MESSZEITPUNKT')
                 add = add.loc[:,"WERT_UNTER_GELAENDE"]
+                add = add.resample('MS').mean()
                 add = add.dropna()
+#                st.write(add)
                 add = add.loc[add.index>=pd.to_datetime(TrendAb)]
                 add = add.loc[add.index<=pd.to_datetime(TrendBis)]
                 if(add.shape[0]<=0):
@@ -231,7 +245,7 @@ with c2:
                 a = linear_model.LinearRegression().fit(x, y)
                 linear_model.LinearRegression(copy_X=True, fit_intercept=True, n_jobs=1)
 
-    
+
         # Berechnung Grimm Strele Trendwerte und Anfügen an Dataframe
                 Messstellen.loc[(Messstellen["MKZ"]==z, "Trend Grimm Strele")] = -a.coef_ / (y.max()-y.min()) *100 # Anstieg in cm/a / Spannweite der cm --> Grimm-Strele Test
                 Messstellen.loc[(Messstellen["MKZ"]==z, "Anstieg Regression")] = -a.coef_  # Anstieg in cm/a
@@ -242,17 +256,23 @@ with c2:
                 
         # Darstellung der Regressionsgeraden im Plot
                 if runtrend:
+                    try:
+                      len(alle.index)
+                    except NameError:
+                      alle = add.copy()
+                    else:
+                      alle = pd.concat([alle, add])
                     # Hinzufügen der Regressionsgeraden zu dataframe mit allen Messstellenwerten
                     pred = alle.iloc[0:2,].copy()
                     pred.loc[0,"MKZ"] = z
                     pred.loc[0,"MESSZEITPUNKT"] = add.index[0]
                     pred.loc[0,"WERT_UNTER_GELAENDE"] = a.predict([[x.min()]])[0]
-                    pred.loc[0,"pred"] = True
+                    pred.loc[0,"pred"] = "Trend"
 
                     pred.loc[1,"MKZ"] = z
                     pred.loc[1,"MESSZEITPUNKT"] = add.index[-1]
                     pred.loc[1,"WERT_UNTER_GELAENDE"] = a.predict([[x.max()]])[0]
-                    pred.loc[1,"pred"] = True
+                    pred.loc[1,"pred"] = "Trend"
 
                     alle = pd.concat([alle, pred])
 
@@ -262,34 +282,30 @@ with c2:
             #        plt.show()
 
         if runtrend:
-            fig = px.line(alle, x="MESSZEITPUNKT",y="WERT_UNTER_GELAENDE", color = "MKZ", height=500)
+            fig = px.line(alle,
+                          x="MESSZEITPUNKT",
+                          y="WERT_UNTER_GELAENDE",
+                          line_dash = "pred",
+                          color = "MKZ",
+                          height=500
+                          )
             fig['layout']['yaxis']['autorange'] = "reversed"
             st.plotly_chart(fig)
-    
+
             #    Darstellung Histogram und Prozent
             trends = Messstellen["Trend Grimm Strele"].copy()
             trends = trends.dropna()
             fig2 = px.histogram(Messstellen, x="Trend Grimm Strele", height=250)
             st.plotly_chart(fig2)
             if trends.shape[0]>=1:
-                st.write("Anteil negativer Trend: "+
-                         str(round(len(trends[trends<=-2]) / len(trends) * 100))+
+                st.write("Anteil negativer Trend laut Streamlit: "+
+                         str(round(len(trends[trends<=-1]) / len(trends) * 100))+
                          "% von "+
                          str(len(trends))+" Messstellen.")
             st.write(Messstellen[Messstellen['MKZ'].isin(MKZs)])
 
         if runtrendall:
-#            Messstellen.to_csv("Trendanalyse_"+
-#                               datetime.datetime.now().strftime("%Y%m%d_%H%M")+
-#                               "_TrendAb"+str(TrendAb)+
-#                               "_TrendBis"+str(TrendBis)+
-#                               "_DatenAb"+str(Mindatum)+
-#                               "_DatenBis"+str(Enddatum)+
-#                               ".csv",
-#                               index = False,
-#                               sep = ";",
-#                               decimal = ","
-#                               )
+
             Messstellen.to_excel("Trendanalyse_"+
                                  datetime.datetime.now().strftime("%Y%m%d_%H%M")+
                                  "_TrendAb"+str(TrendAb)+
