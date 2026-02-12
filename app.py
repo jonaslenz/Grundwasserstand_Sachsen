@@ -48,7 +48,7 @@ Messstellen = Messstellen.merge(Mess_GWK, on = "MKZ", how = "outer")
 
 Messstellen['Erstes_Messdatum'] = pd.to_datetime(Messstellen['Erstes_Messdatum'], format='%Y-%m-%d')
 Messstellen['Letztes_Messdatum'] = pd.to_datetime(Messstellen['Letztes_Messdatum'], format='%Y-%m-%d')
-Messstellen['GRIMM-STRELE'] = Messstellen['GRIMM-STRELE'].to_numeric()
+Messstellen['GRIMM-STRELE'] = pd.to_numeric(Messstellen['GRIMM-STRELE'])
 
 transformer = Transformer.from_crs("EPSG:25833", "EPSG:4326")
 lat, lon = transformer.transform(Messstellen.RW_ETRS89, Messstellen.HW_ETRS89)
@@ -319,5 +319,6 @@ with c2:
             my_bar.empty()
             st.write("Tabelle zum Download bereit.")
             st.rerun()
+
 
 
