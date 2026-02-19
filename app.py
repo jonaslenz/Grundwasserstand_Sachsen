@@ -102,6 +102,7 @@ with c2:
                       decimal=',',
        #               parse_dates=["MESSZEITPUNKT"],
         #              date_parser=dateparse,
+                      encoding='cp1252'
                       )
       add['MESSZEITPUNKT'] = pd.to_datetime(add['MESSZEITPUNKT'], format='%Y-%m-%d')
       try:
@@ -117,6 +118,7 @@ with c2:
       fig['layout']['yaxis']['autorange'] = "reversed"
 
     st.plotly_chart(fig)
+
 
 
 
