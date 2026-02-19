@@ -29,7 +29,8 @@ cacheorload('Export_MKZ_Uebersicht.csv')
 Messstellen = pd.read_csv('./cache/Export_MKZ_Uebersicht.csv',
                       sep=';',
                       thousands='.',
-                      decimal=','
+                      decimal=',',
+                      encoding='cp1252'
                       )
 
 Mess_GWK = pd.read_csv('./MKZ_GWK.csv',
@@ -101,6 +102,7 @@ with c2:
                       decimal=',',
        #               parse_dates=["MESSZEITPUNKT"],
         #              date_parser=dateparse,
+                      encoding='cp1252'
                       )
       add['MESSZEITPUNKT'] = pd.to_datetime(add['MESSZEITPUNKT'], format='%Y-%m-%d')
       try:
@@ -116,5 +118,10 @@ with c2:
       fig['layout']['yaxis']['autorange'] = "reversed"
 
     st.plotly_chart(fig)
+
+
+
+
+
 
 
