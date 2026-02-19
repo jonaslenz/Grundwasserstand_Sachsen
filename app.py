@@ -29,7 +29,8 @@ cacheorload('Export_MKZ_Uebersicht.csv')
 Messstellen = pd.read_csv('./cache/Export_MKZ_Uebersicht.csv',
                       sep=';',
                       thousands='.',
-                      decimal=','
+                      decimal=',',
+                      encoding='cp273'
                       )
 st.write(Messstellen)
 st.stop()
@@ -118,6 +119,7 @@ with c2:
       fig['layout']['yaxis']['autorange'] = "reversed"
 
     st.plotly_chart(fig)
+
 
 
 
