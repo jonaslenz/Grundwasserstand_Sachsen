@@ -191,6 +191,12 @@ with c2:
         
         if runtrend or runtrendall:
             Messstellen["TrendFehler"] = ""
+            Messstellen["Trend Grimm Strele"] = pd.NA
+            Messstellen["Anstieg Regression"] = pd.NA
+            Messstellen["Spanne"] = pd.NA
+            Messstellen["Anzahl Werte"] = pd.NA
+            Messstellen["Messturnus [Tage] geschätzt"] = pd.NA
+
             first_notice = True
             if runtrendall:
                 MKZs = Messstellen["MKZ"]
@@ -254,7 +260,7 @@ with c2:
                 Messstellen.loc[(Messstellen["MKZ"]==z, "Anzahl Werte")] = len(y) # Anzahl der Werte
                 Turnus = np.median(np.diff([xss for xs in x for xss in xs]))*365
                 Messstellen.loc[(Messstellen["MKZ"]==z, "Messturnus [Tage] geschätzt")] = Turnus # Anzahl der Werte
-                
+
         # Darstellung der Regressionsgeraden im Plot
                 if runtrend:
                     try:
@@ -318,8 +324,3 @@ with c2:
             my_bar.empty()
             st.write("Tabelle zum Download bereit.")
             st.rerun()
-
-
-
-
-
