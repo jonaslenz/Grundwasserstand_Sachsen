@@ -11,6 +11,7 @@ import os.path
 #import plotly
 #import plotly.tools as tls
 import plotly.express as px
+import plotly.graph_objects as go
 
 from DF_Filter import filter_dataframe 
 
@@ -30,6 +31,7 @@ Messstellen = pd.read_csv('./cache/Export_MKZ_Uebersicht.csv',
                       sep=';',
                       thousands='.',
                       decimal=',',
+                      dtype={'MKZ': "string"},
                       encoding='cp1252'
                       )
 
@@ -37,6 +39,7 @@ Mess_GWK = pd.read_csv('./MKZ_GWK.csv',
                       sep=';',
                       thousands='.',
                       decimal=',',
+                      dtype={'MKZ': "string"},
 #                      index = "MKZ"
                       )
 Mess_GWK = Mess_GWK.fillna("na")
@@ -102,7 +105,8 @@ with c2:
                       decimal=',',
        #               parse_dates=["MESSZEITPUNKT"],
         #              date_parser=dateparse,
-                      encoding='cp1252'
+                      encoding='cp1252',
+                      dtype={'MKZ': "string"},
                       )
       add['MESSZEITPUNKT'] = pd.to_datetime(add['MESSZEITPUNKT'], format='%Y-%m-%d')
       try:
@@ -117,11 +121,31 @@ with c2:
     if type == "WERT_UNTER_GELAENDE":
       fig['layout']['yaxis']['autorange'] = "reversed"
 
+    if type == "WERT_IM_HOEHENSYSTEM":
+      if st.checkbox("zeichne Filterlage"):
+        nofilter = ""
+        color_map = {trace.name: trace.line.color for trace in fig.data}
+        for allex in MKZs:
+          if pd.isna(Auswahl[Auswahl['MKZ']==allex]['FILTERUNTERKANTE'].item()):
+            nofilter += allex+ "; "
+            continue
+
+          fig.add_trace(go.Scatter(
+            x=[Auswahl[Auswahl['MKZ']==allex]['Erstes_Messdatum'].item(), Auswahl[Auswahl['MKZ']==allex]['Letztes_Messdatum'].item(),
+               Auswahl[Auswahl['MKZ']==allex]['Letztes_Messdatum'].item(), Auswahl[Auswahl['MKZ']==allex]['Erstes_Messdatum'].item()],
+            y=[Auswahl[Auswahl['MKZ']==allex]['FILTERUNTERKANTE'].item()]*2 + [Auswahl[Auswahl['MKZ']==allex]['FILTEROBERKANTE'].item()]*2,
+            fill="toself",
+            fillcolor=color_map.get(allex, "blue"),
+            opacity=0.15,
+            line=dict(width=0),
+            showlegend=False,
+            mode="lines",
+            legendgroup=allex
+          ))
+
+        if nofilter != "":
+          st.write("Keine Filterlageninformation bei: "+ nofilter)
+
+
     st.plotly_chart(fig)
-
-
-
-
-
-
 
