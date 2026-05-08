@@ -205,11 +205,11 @@ with c2:
     # 1. Monat aus dem Datum extrahieren (alternativ kann man auch resample verwenden)
     alle['Monat'] = alle['MESSZEITPUNKT'].dt.to_period('M')
     # 2. Nach Kategorie und Monat gruppieren und Mittelwert berechnen
-    monatliche_mittel = alle.groupby(['MKZ', 'Monat'])['WERT UNTER GELÄNDE'].mean().reset_index()
+    monatliche_mittel = alle.groupby(['MKZ', 'Monat'])['WERT_UNTER_GELAENDE'].mean().reset_index()
     st.write(monatliche_mittel)
     
     monatliche_mittel.index += pd.Timedelta(days=14)
     st.write(monatliche_mittel.head())
-    monatliche_mittel['NW'] = alle.groupby(['MKZ', 'Monat'])['WERT UNTER GELÄNDE'].min().reset_index()
+    monatliche_mittel['NW'] = alle.groupby(['MKZ', 'Monat'])['WERT_UNTER_GELAENDE'].min().reset_index()
     st.write(monatliche_mittel.head())
     
