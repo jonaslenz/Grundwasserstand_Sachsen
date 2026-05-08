@@ -210,6 +210,6 @@ with c2:
     
     monatliche_mittel.index += pd.Timedelta(days=14)
     st.write(monatliche_mittel.head())
-    monatliche_mittel['NW] = alle.groupby(['MKZ', 'Monat'])['WERT UNTER GELÄNDE'].min().reset_index()
+    monatliche_mittel['NW'] = alle.groupby(['MKZ', 'Monat'])['WERT UNTER GELÄNDE'].min().reset_index()
     st.write(monatliche_mittel.head())
     
