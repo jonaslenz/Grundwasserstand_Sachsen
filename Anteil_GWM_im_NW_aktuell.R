@@ -1,4 +1,4 @@
-library(openxlsx)
+#library(openxlsx)
 library(readxl)
 library(dplyr)
 library(ggplot2)
@@ -55,41 +55,38 @@ for (MKZ in c(
 '56383704','56393712','56401226'
 ))
 {
-  add <- read.csv(paste0("./cache/",MKZ,".csv"))
-  if (is.dataframe(Styxexport))
+  Styxexport <- read.csv2(paste0("./cache/ExportSN_GWS-Rohdaten_",MKZ,".csv"))
+
+  ### set format
+  Styxexport$MKZ <- as.character(Styxexport$MKZ)
+  Styxexport$MESSZEITPUNKT <- as.Date(Styxexport$MESSZEITPUNKT, format = "%Y-%m-%d")
+  Styxexport$JAHR <- strftime(Styxexport$MESSZEITPUNKT, "%Y")
+  Styxexport$MONAT_Nr <- strftime(Styxexport$MESSZEITPUNKT, "%m")
+  Styxexport$MONAT <- strftime(Styxexport$MESSZEITPUNKT, "%b")
+  Styxexport$GWS <- Styxexport$`WERT_UNTER_GELAENDE`
+  Styxexport <- Styxexport[c("MKZ","JAHR","MONAT_Nr","MONAT","GWS")]
+  
+  if (exists("alle"))
   {
-    Styxexport <- rbind(Styxexport, add)
+    alle <- rbind(alle, Styxexport)
   }
   else(
-    Styxexport <- add
+    alle <- Styxexport
   )
-  rm(add)
+  rm(Styxexport)
 }
-
-
 ### check if there are 279 GWM
-MKZ_Liste <- unique(Styxexport$MKZ)
-
-### set format
-Styxexport$MKZ <- as.character(Styxexport$MKZ)
-Styxexport$MESSZEITPUNKT <- as.Date(Styxexport$MESSZEITPUNKT, format = "%Y-%m-%d")
-Styxexport$JAHR <- strftime(Styxexport$MESSZEITPUNKT, "%Y")
-Styxexport$MONAT_Nr <- strftime(Styxexport$MESSZEITPUNKT, "%m")
-Styxexport$MONAT <- strftime(Styxexport$MESSZEITPUNKT, "%b")
-Styxexport$GWS <- Styxexport$`WERT UNTER GELÄNDE`
-data <- Styxexport[c("MKZ","JAHR","MONAT_Nr","MONAT","GWS")]
-rm(Styxexport)
-
+MKZ_Liste <- unique(alle$MKZ)
 
 ### Mittelwert per MKZ,Jahr,Monat
-GWS_MM <- aggregate(GWS~ MKZ+JAHR+MONAT_Nr, data = data, FUN = mean)
+GWS_MM <- aggregate(GWS~ MKZ+JAHR+MONAT_Nr, data = alle, FUN = mean)
 GWS_MM$TAG <- "15"
 GWS_MM$DATUM <- paste(GWS_MM$TAG, GWS_MM$MONAT_Nr, GWS_MM$JAHR, sep="-")
 GWS_MM$DATUM <- as.Date(GWS_MM$DATUM, format = "%d-%m-%Y")
 
 
 ### calc Niedrigwasser # minimum per GWM+year+month
-GWS_min <- aggregate(GWS ~ MKZ+JAHR+MONAT_Nr, data = data, FUN = min)
+GWS_min <- aggregate(GWS ~ MKZ+JAHR+MONAT_Nr, data = alle, FUN = min)
 # MNW ... mittleres Niedigwasser per GWM+month
 GWS_MNW <- aggregate(GWS ~ MKZ+MONAT_Nr, data = GWS_min, FUN = mean)
 # merge
@@ -200,7 +197,7 @@ Plot_GWStand<-ggplot(data=GWS_MM_MNW_Anzahl, aes(x=DATUM, y=n_MNW_perc_sma12, gr
         legend.key = element_rect(fill = "white", color= "white"),
         legend.key.width= unit(1., 'cm'),
         legend.key.height= unit(0.2, 'cm')) 
-# Plot_GWStand
+Plot_GWStand
 
 
 ### save plot as png
