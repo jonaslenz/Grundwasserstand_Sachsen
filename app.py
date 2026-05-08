@@ -215,7 +215,7 @@ with c2:
     monatliche_mittel.set_index('Monat', inplace=True)
     st.write(monatliche_mittel)
 
-    st.write(monatliche_mittel[monatliche_mittel['Mittelwert'] < monatliche_mittel['Minimum']]['MKZ'].unique()
+    st.write(monatliche_mittel[monatliche_mittel['Mittelwert'] < monatliche_mittel['Minimum']]['MKZ'].unique())
 
     st.plotly_chart(monatliche_mittel[['MKZ'],['Anzahl_Messwerte']])
 
