@@ -2,17 +2,15 @@
 # --- PAKET-MANAGEMENT (Überarbeitung 16.02.2026) ---
 #######################################################
 
-  library(ggplot2)
-  library(dplyr)
-  library(tibble)
-  library(magrittr)
-  library(ragg)
-  library(farver)
-  library(tidyr)
-  library(lubridate)
-  library(viridis)
-  library(patchwork)
-  library(svglite)
+library(ggplot2)
+library(dplyr)
+library(tibble)
+library(magrittr)
+library(ragg)
+library(farver)
+library(tidyr)
+library(lubridate)
+library(svglite)
 
 for (MKZ in c(
 '43420072','44406436','44416534','44416552','44425470','44429484',
@@ -85,10 +83,10 @@ for (MKZ in c(
   rm(Styxexport)
 }
 ### check wie viele einzelne GWM
-MKZ_Liste <- unique(Styxexport$MKZ)
+MKZ_Liste <- unique(alle$MKZ)
 
 ### Mittelwert/MKZ,Jahr,Monat
-mean_MKZ<- aggregate(GWS~ MKZ+JAHR+MONAT_Nr+MONAT, data = data, FUN = mean)
+mean_MKZ<- aggregate(GWS~ MKZ+JAHR+MONAT_Nr+MONAT, data = alle, FUN = mean)
 #mean_MKZ$JAHR<-as.character(mean_MKZ$JAHR)
 mean_MKZ$TAG <- "15"
 mean_MKZ$DATUM <- paste(mean_MKZ$TAG,mean_MKZ$MONAT_Nr,mean_MKZ$JAHR, sep="-")
@@ -216,60 +214,60 @@ png(file = filename, width = 850, height = 570)
 Plot_GWStand
 dev.off()
 
-### adds
-# Colorblind-palette: "#96D005", "#785EF0", "#FE6100"
-
-### manchmal Exporte für UM
-# Monatsmittel zusammenführen
-Monatsmittel_export <- bind_rows(Monatsmittel, Monatsmittel_2025, Monatsmittel_2026) %>%
-  distinct(JAHR, MONAT, DATUM, .keep_all = TRUE) %>%
-  arrange(DATUM)
-
-# Erstellt vollständige Tabelle für das Quantil-Sheet mit Jahres- und Datumsinfos + Quantilen
-quantile_export <- Monatsmittel_export %>%
-  select(JAHR, MONAT, DATUM) %>%
-  distinct() %>%
-  left_join(draw_Quantile, by = "MONAT")
-quantile_export <- quantile_export %>%
-  left_join(
-    Monatsmittel_export %>%
-      group_by(JAHR, MONAT) %>%
-      summarise(Anzahl = n(), .groups = "drop"),
-    by = c("JAHR", "MONAT")
-  )
-
-
-# exportiert eine Excel-Datei mit zwei Arbeitsblättern 
-# write_xlsx(
-#  list(
-#    "Sheet1" = Monatsmittel_export,
-#    "Quantile" = quantile_export
-#  ),
-#  path = paste0("Monatsmittel_", format(Sys.time(), "%Y%m%d"), ".xlsx")
-#)
-
-
-### Vollständigkeit: letzte 24 volle Monate ------------------------------------
-
-# Zeitraum: letzte 24 volle Monate
-m_end <- as.Date(format(Sys.Date(), "%Y-%m-01")) - 1
-month_keys <- format(seq.Date(as.Date(format(m_end, "%Y-%m-01")) - months(23), 
-                              by = "1 month", length.out = 24), "%Y-%m")
-
-# Vollständigkeit berechnen
-vollstaendigkeit <- data %>%
-  mutate(MONAT_KEY = sprintf("%04d-%02d", JAHR, MONAT_Nr)) %>%
-  filter(MONAT_KEY %in% month_keys) %>%
-  group_by(MKZ, MONAT_KEY) %>%
-  summarise(Werte = sum(!is.na(GWS)), .groups = "drop") %>%
-  right_join(expand_grid(MKZ = sort(unique(data$MKZ)), MONAT_KEY = month_keys), 
-             by = c("MKZ", "MONAT_KEY")) %>%
-  mutate(Werte = replace_na(Werte, 0L)) %>%
-  pivot_wider(names_from = MONAT_KEY, values_from = Werte, values_fill = 0) %>%
-  arrange(MKZ)
-
-# Export
-#write_xlsx(
-#  list("Vollstaendigkeit" = vollstaendigkeit),
-#  path = paste0("Vollstaendigkeit_", format(Sys.Date(), "%Y%m%d"), ".xlsx")
-#)
+# ### adds
+# # Colorblind-palette: "#96D005", "#785EF0", "#FE6100"
+# 
+# ### manchmal Exporte für UM
+# # Monatsmittel zusammenführen
+# Monatsmittel_export <- bind_rows(Monatsmittel, Monatsmittel_2025, Monatsmittel_2026) %>%
+#   distinct(JAHR, MONAT, DATUM, .keep_all = TRUE) %>%
+#   arrange(DATUM)
+# 
+# # Erstellt vollständige Tabelle für das Quantil-Sheet mit Jahres- und Datumsinfos + Quantilen
+# quantile_export <- Monatsmittel_export %>%
+#   select(JAHR, MONAT, DATUM) %>%
+#   distinct() %>%
+#   left_join(draw_Quantile, by = "MONAT")
+# quantile_export <- quantile_export %>%
+#   left_join(
+#     Monatsmittel_export %>%
+#       group_by(JAHR, MONAT) %>%
+#       summarise(Anzahl = n(), .groups = "drop"),
+#     by = c("JAHR", "MONAT")
+#   )
+# 
+# 
+# # exportiert eine Excel-Datei mit zwei Arbeitsblättern 
+# # write_xlsx(
+# #  list(
+# #    "Sheet1" = Monatsmittel_export,
+# #    "Quantile" = quantile_export
+# #  ),
+# #  path = paste0("Monatsmittel_", format(Sys.time(), "%Y%m%d"), ".xlsx")
+# #)
+# 
+# 
+# ### Vollständigkeit: letzte 24 volle Monate ------------------------------------
+# 
+# # Zeitraum: letzte 24 volle Monate
+# m_end <- as.Date(format(Sys.Date(), "%Y-%m-01")) - 1
+# month_keys <- format(seq.Date(as.Date(format(m_end, "%Y-%m-01")) - months(23), 
+#                               by = "1 month", length.out = 24), "%Y-%m")
+# 
+# # Vollständigkeit berechnen
+# vollstaendigkeit <- data %>%
+#   mutate(MONAT_KEY = sprintf("%04d-%02d", JAHR, MONAT_Nr)) %>%
+#   filter(MONAT_KEY %in% month_keys) %>%
+#   group_by(MKZ, MONAT_KEY) %>%
+#   summarise(Werte = sum(!is.na(GWS)), .groups = "drop") %>%
+#   right_join(expand_grid(MKZ = sort(unique(data$MKZ)), MONAT_KEY = month_keys), 
+#              by = c("MKZ", "MONAT_KEY")) %>%
+#   mutate(Werte = replace_na(Werte, 0L)) %>%
+#   pivot_wider(names_from = MONAT_KEY, values_from = Werte, values_fill = 0) %>%
+#   arrange(MKZ)
+# 
+# # Export
+# #write_xlsx(
+# #  list("Vollstaendigkeit" = vollstaendigkeit),
+# #  path = paste0("Vollstaendigkeit_", format(Sys.Date(), "%Y%m%d"), ".xlsx")
+# #)

@@ -3,3 +3,10 @@ r-base-dev
 r-cran-ggplot2
 r-cran-dplyr
 r-cran-pracma
+r-cran-tibble
+r-cran-magrittr
+r-cran-ragg
+r-cran-farver
+r-cran-tidyr
+r-cran-lubridate
+r-cran-svglite

@@ -152,61 +152,71 @@ with c2:
     for x in MKZs:
       cacheorload("ExportSN_GWS-Rohdaten_"+x+".csv")
       
-      #dateparse = lambda x: datetime.datetime.strptime(x, '%Y-%m-%d')
+      if st.toggle("zeichne Ganglinien", value = False):
       
-      add = pd.read_csv('./cache/ExportSN_GWS-Rohdaten_'+x+'.csv',
-                      sep=';',
-                      thousands='.',
-                      decimal=',',
-       #               parse_dates=["MESSZEITPUNKT"],
-        #              date_parser=dateparse,
-                      encoding='cp1252',
-                      dtype={'MKZ': "string"},
-                      )
-      add['MESSZEITPUNKT'] = pd.to_datetime(add['MESSZEITPUNKT'], format='%Y-%m-%d')
-      try:
-        len(alle.index)
-      except NameError:
-        alle = add.copy()
-      else:
-        alle = pd.concat([alle, add])
-
-    fig = px.line(alle, x="MESSZEITPUNKT",y=type, color = "MKZ", height=600)
-
-    if type == "WERT_UNTER_GELAENDE":
-      fig['layout']['yaxis']['autorange'] = "reversed"
-
-    if type == "WERT_IM_HOEHENSYSTEM":
-      if st.checkbox("zeichne Filterlage"):
-        nofilter = ""
-        color_map = {trace.name: trace.line.color for trace in fig.data}
-        for allex in MKZs:
-          if pd.isna(Auswahl[Auswahl['MKZ']==allex]['FILTERUNTERKANTE'].item()):
-            nofilter += allex+ "; "
-            continue
-
-          fig.add_trace(go.Scatter(
-            x=[Auswahl[Auswahl['MKZ']==allex]['Erstes_Messdatum'].item(), Auswahl[Auswahl['MKZ']==allex]['Letztes_Messdatum'].item(),
-               Auswahl[Auswahl['MKZ']==allex]['Letztes_Messdatum'].item(), Auswahl[Auswahl['MKZ']==allex]['Erstes_Messdatum'].item()],
-            y=[Auswahl[Auswahl['MKZ']==allex]['FILTERUNTERKANTE'].item()]*2 + [Auswahl[Auswahl['MKZ']==allex]['FILTEROBERKANTE'].item()]*2,
-            fill="toself",
-            fillcolor=color_map.get(allex, "blue"),
-            opacity=0.15,
-            line=dict(width=0),
-            showlegend=False,
-            mode="lines",
-            legendgroup=allex
-          ))
-
-        if nofilter != "":
-          st.write("Keine Filterlageninformation bei: "+ nofilter)
-
-
-    st.plotly_chart(fig)
+        #dateparse = lambda x: datetime.datetime.strptime(x, '%Y-%m-%d')
+        
+        add = pd.read_csv('./cache/ExportSN_GWS-Rohdaten_'+x+'.csv',
+                        sep=';',
+                        thousands='.',
+                        decimal=',',
+         #               parse_dates=["MESSZEITPUNKT"],
+          #              date_parser=dateparse,
+                        encoding='cp1252',
+                        dtype={'MKZ': "string"},
+                        )
+        add['MESSZEITPUNKT'] = pd.to_datetime(add['MESSZEITPUNKT'], format='%Y-%m-%d')
+        try:
+          len(alle.index)
+        except NameError:
+          alle = add.copy()
+        else:
+          alle = pd.concat([alle, add])
+  
+      fig = px.line(alle, x="MESSZEITPUNKT",y=type, color = "MKZ", height=600)
+  
+      if type == "WERT_UNTER_GELAENDE":
+        fig['layout']['yaxis']['autorange'] = "reversed"
+  
+      if type == "WERT_IM_HOEHENSYSTEM":
+        if st.checkbox("zeichne Filterlage"):
+          nofilter = ""
+          color_map = {trace.name: trace.line.color for trace in fig.data}
+          for allex in MKZs:
+            if pd.isna(Auswahl[Auswahl['MKZ']==allex]['FILTERUNTERKANTE'].item()):
+              nofilter += allex+ "; "
+              continue
+  
+            fig.add_trace(go.Scatter(
+              x=[Auswahl[Auswahl['MKZ']==allex]['Erstes_Messdatum'].item(), Auswahl[Auswahl['MKZ']==allex]['Letztes_Messdatum'].item(),
+                 Auswahl[Auswahl['MKZ']==allex]['Letztes_Messdatum'].item(), Auswahl[Auswahl['MKZ']==allex]['Erstes_Messdatum'].item()],
+              y=[Auswahl[Auswahl['MKZ']==allex]['FILTERUNTERKANTE'].item()]*2 + [Auswahl[Auswahl['MKZ']==allex]['FILTEROBERKANTE'].item()]*2,
+              fill="toself",
+              fillcolor=color_map.get(allex, "blue"),
+              opacity=0.15,
+              line=dict(width=0),
+              showlegend=False,
+              mode="lines",
+              legendgroup=allex
+            ))
+  
+          if nofilter != "":
+            st.write("Keine Filterlageninformation bei: "+ nofilter)
+  
+  
+      st.plotly_chart(fig)
 
   if monat:
-    process2 = subprocess.Popen(["Rscript", "D:/Projekte/Grundwasserstand_Sachsen/Anteil_GWM_im_NW_aktuell.R"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
-    result2 = process2.communicate()
+    if st.button("neuberechnen GWM im NW"):
+      process2 = subprocess.Popen(["Rscript", "./Anteil_GWM_im_NW_aktuell.R"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+      result2 = process2.communicate()
+      st.write(result2)
+
+    if st.button("GWS Sachsenweit"):
+      process = subprocess.Popen(["Rscript", "./GWS_sachsenweit_aktuell_farbig.R"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+      result = process.communicate()
+      st.write(result)
+
     def file_selector(folder_path='.'):
       filenames = glob.glob('*.png')
       selected_filename = st.selectbox('Select a file', filenames)
