@@ -215,6 +215,8 @@ with c2:
     monatliche_mittel.set_index('Monat', inplace=True)
     st.write(monatliche_mittel)
 
+    st.write(monatliche_mittel[monatliche_mittel['Mittelwert'] < monatliche_mittel['Minimum']]['MKZ'].unique()
 
-    #monatliche_mittel.index += pd.Timedelta(days=14)
-    #st.write(monatliche_mittel)
+    st.plotly_chart(monatliche_mittel[['MKZ'],['Anzahl_Messwerte']])
+
+    
