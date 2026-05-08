@@ -206,7 +206,7 @@ with c2:
           st.write("Keine Filterlageninformation bei: "+ nofilter)
   
   
-    st.plotly_chart(fig)
+      st.plotly_chart(fig)
 
   if monat:
     if st.button("neuberechnen GWM im NW"):
