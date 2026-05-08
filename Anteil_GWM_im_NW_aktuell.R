@@ -1,9 +1,8 @@
 #library(openxlsx)
-library(readxl)
+#library(readxl)
 library(dplyr)
 library(ggplot2)
-library(grid)
-library(pracma) #only for moving average
+#library(pracma) #only for moving average
 
 for (MKZ in c(
 '43420072','44406436','44416534','44416552','44425470','44429484',
