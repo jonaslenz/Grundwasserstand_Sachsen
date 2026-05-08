@@ -4,5 +4,5 @@ r-cran-ggplot2
 r-cran-openxlsx
 r-cran-readxl
 r-cran-dplyr
-r-cran-grid
+r-base-grid
 r-cran-pracma
