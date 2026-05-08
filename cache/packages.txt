@@ -1,0 +1,8 @@
+r-base
+r-base-dev
+r-cran-ggplot2
+r-cran-openxlsx
+r-cran-readxl
+r-cran-dplyr
+r-cran-grid
+r-cran-pracma
