@@ -173,38 +173,38 @@ with c2:
         else:
           alle = pd.concat([alle, add])
   
-      fig = px.line(alle, x="MESSZEITPUNKT",y=type, color = "MKZ", height=600)
+        fig = px.line(alle, x="MESSZEITPUNKT",y=type, color = "MKZ", height=600)
   
-      if type == "WERT_UNTER_GELAENDE":
-        fig['layout']['yaxis']['autorange'] = "reversed"
+        if type == "WERT_UNTER_GELAENDE":
+          fig['layout']['yaxis']['autorange'] = "reversed"
   
-      if type == "WERT_IM_HOEHENSYSTEM":
-        if st.checkbox("zeichne Filterlage"):
-          nofilter = ""
-          color_map = {trace.name: trace.line.color for trace in fig.data}
-          for allex in MKZs:
-            if pd.isna(Auswahl[Auswahl['MKZ']==allex]['FILTERUNTERKANTE'].item()):
-              nofilter += allex+ "; "
-              continue
+        if type == "WERT_IM_HOEHENSYSTEM":
+          if st.checkbox("zeichne Filterlage"):
+            nofilter = ""
+            color_map = {trace.name: trace.line.color for trace in fig.data}
+            for allex in MKZs:
+              if pd.isna(Auswahl[Auswahl['MKZ']==allex]['FILTERUNTERKANTE'].item()):
+                nofilter += allex+ "; "
+                continue
   
-            fig.add_trace(go.Scatter(
-              x=[Auswahl[Auswahl['MKZ']==allex]['Erstes_Messdatum'].item(), Auswahl[Auswahl['MKZ']==allex]['Letztes_Messdatum'].item(),
-                 Auswahl[Auswahl['MKZ']==allex]['Letztes_Messdatum'].item(), Auswahl[Auswahl['MKZ']==allex]['Erstes_Messdatum'].item()],
-              y=[Auswahl[Auswahl['MKZ']==allex]['FILTERUNTERKANTE'].item()]*2 + [Auswahl[Auswahl['MKZ']==allex]['FILTEROBERKANTE'].item()]*2,
-              fill="toself",
-              fillcolor=color_map.get(allex, "blue"),
-              opacity=0.15,
-              line=dict(width=0),
-              showlegend=False,
-              mode="lines",
-              legendgroup=allex
-            ))
+              fig.add_trace(go.Scatter(
+                x=[Auswahl[Auswahl['MKZ']==allex]['Erstes_Messdatum'].item(), Auswahl[Auswahl['MKZ']==allex]['Letztes_Messdatum'].item(),
+                   Auswahl[Auswahl['MKZ']==allex]['Letztes_Messdatum'].item(), Auswahl[Auswahl['MKZ']==allex]['Erstes_Messdatum'].item()],
+                y=[Auswahl[Auswahl['MKZ']==allex]['FILTERUNTERKANTE'].item()]*2 + [Auswahl[Auswahl['MKZ']==allex]['FILTEROBERKANTE'].item()]*2,
+                fill="toself",
+                fillcolor=color_map.get(allex, "blue"),
+                opacity=0.15,
+                line=dict(width=0),
+                showlegend=False,
+                mode="lines",
+                legendgroup=allex
+              ))
+    
+            if nofilter != "":
+              st.write("Keine Filterlageninformation bei: "+ nofilter)
   
-          if nofilter != "":
-            st.write("Keine Filterlageninformation bei: "+ nofilter)
   
-  
-      st.plotly_chart(fig)
+        st.plotly_chart(fig)
 
   if monat:
     if st.button("neuberechnen GWM im NW"):
