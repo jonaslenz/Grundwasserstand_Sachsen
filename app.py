@@ -58,7 +58,7 @@ Messstellen['lon'] = lon
 #st.write(Messstellen.columns.values)
 
 with c1:
-  if st.toggle("Monatsbericht", value = FALSE):
+  if st.toggle("Monatsbericht", value = False):
     monat = True
     MKZs = ['43420072','44406436','44416534','44416552','44425470','44429484',
 '45400522','45400717','45416459','45426108','45430523','45440655',
@@ -208,3 +208,5 @@ with c2:
     monatliche_mittel = alle.groupby(['MKZ', 'Monat'])['WERT UNTER GELÄNDE'].mean().reset_index()
     st.write(monatliche_mittel)
 
+    monatliche_mittel.index += pd.Timedelta(days=14)
+    st.write(monatliche_mittel.head())
