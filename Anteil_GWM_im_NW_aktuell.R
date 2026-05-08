@@ -2,7 +2,7 @@
 #library(readxl)
 library(dplyr)
 library(ggplot2)
-#library(pracma) #only for moving average
+library(pracma) #only for moving average
 
 for (MKZ in c(
 '43420072','44406436','44416534','44416552','44425470','44429484',
@@ -203,7 +203,6 @@ Plot_GWStand
 filename <- paste0("Anteil_GWM_im_NW_",format(Sys.time(), "%Y%m%d"),".png")
 png(file = filename, width = 800, height = 570)
 Plot_GWStand
-print(Plot_GWStand)
 dev.off()
 
 #write_xlsx(merged_Anzahl, "GWM_im_NW_",format(Sys.time(), "%Y%m%d"),".xlsx")
