@@ -168,10 +168,10 @@ with c2:
       else:
         alle = pd.concat([alle, add])
 
-    fig = px.line(alle, x="MESSZEITPUNKT",y=type, color = "MKZ", height=600)
+#    fig = px.line(alle, x="MESSZEITPUNKT",y=type, color = "MKZ", height=600)
 
-    if type == "WERT_UNTER_GELAENDE":
-      fig['layout']['yaxis']['autorange'] = "reversed"
+#    if type == "WERT_UNTER_GELAENDE":
+#      fig['layout']['yaxis']['autorange'] = "reversed"
 
     if type == "WERT_IM_HOEHENSYSTEM":
       if st.checkbox("zeichne Filterlage"):
@@ -199,9 +199,8 @@ with c2:
           st.write("Keine Filterlageninformation bei: "+ nofilter)
 
 
-    st.plotly_chart(fig)
+ #   st.plotly_chart(fig)
   if monat:
-    alle.index
     # 1. Monat aus dem Datum extrahieren (alternativ kann man auch resample verwenden)
     alle['Monat'] = alle['MESSZEITPUNKT'].dt.to_period('M')
     # 2. Nach Kategorie und Monat gruppieren und Mittelwert berechnen
@@ -212,5 +211,6 @@ with c2:
     st.write(monatliche_mittel_NW.head())
 
     monatliche_mittel.set_index('Monat', inplace=True)
+    st.write(monatliche_mittel)
     monatliche_mittel.index += pd.Timedelta(days=14)
     st.write(monatliche_mittel)
