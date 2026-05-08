@@ -207,6 +207,9 @@ with c2:
     # 2. Nach Kategorie und Monat gruppieren und Mittelwert berechnen
     monatliche_mittel = alle.groupby(['MKZ', 'Monat'])['WERT UNTER GELÄNDE'].mean().reset_index()
     st.write(monatliche_mittel)
-
+    
     monatliche_mittel.index += pd.Timedelta(days=14)
     st.write(monatliche_mittel.head())
+    monatliche_mittel['NW] = alle.groupby(['MKZ', 'Monat'])['WERT UNTER GELÄNDE'].min().reset_index()
+    st.write(monatliche_mittel.head())
+    
