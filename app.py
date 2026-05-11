@@ -175,7 +175,8 @@ with c2:
       else:
         alle = pd.concat([alle, add])
 
-    fig = px.line(alle, x="MESSZEITPUNKT",y=type, color = "MKZ", height=600)
+    if zeichne:
+      fig = px.line(alle, x="MESSZEITPUNKT",y=type, color = "MKZ", height=600)
 
     if type == "WERT_UNTER_GELAENDE":
       fig['layout']['yaxis']['autorange'] = "reversed"
