@@ -12,10 +12,6 @@ library(tidyr)
 library(lubridate)
 library(svglite)
 
-# Umgebung auf Deutsche Monatsnamen setzen - Probiere verschiedene Schreibweisen (Linux Distributionen) 
-Sys.setlocale("LC_TIME", "de_DE") # Viele Linux-Distributionen
-Sys.setlocale("LC_TIME", "de_DE.utf8")
-Sys.setlocale("LC_TIME", "de_DE.UTF-8")
 
 for (MKZ in c(
 '43420072','44406436','44416534','44416552','44425470','44429484',
@@ -87,6 +83,22 @@ for (MKZ in c(
   )
   rm(Styxexport)
 }
+
+# Hartes schreiben der deutschen Monate, da kein deutsches locale auf streamlit 
+alle$MONAT[alle$MONAT_Nr == 1] <- "Jan"
+alle$MONAT[alle$MONAT_Nr == 2] <- "Feb"
+alle$MONAT[alle$MONAT_Nr == 3] <- "Mrz"
+alle$MONAT[alle$MONAT_Nr == 4] <- "Apr"
+alle$MONAT[alle$MONAT_Nr == 5] <- "Mai"
+alle$MONAT[alle$MONAT_Nr == 6] <- "Jun"
+alle$MONAT[alle$MONAT_Nr == 7] <- "Jul"
+alle$MONAT[alle$MONAT_Nr == 8] <- "Aug"
+alle$MONAT[alle$MONAT_Nr == 9] <- "Sep"
+alle$MONAT[alle$MONAT_Nr == 10] <- "Okt"
+alle$MONAT[alle$MONAT_Nr == 11] <- "Nov"
+alle$MONAT[alle$MONAT_Nr == 12] <- "Dez"
+
+
 ### check wie viele einzelne GWM
 MKZ_Liste <- unique(alle$MKZ)
 
