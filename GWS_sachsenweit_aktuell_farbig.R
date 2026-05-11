@@ -12,6 +12,9 @@ library(tidyr)
 library(lubridate)
 library(svglite)
 
+# Umgebung auf Deutsche Monatsnamen setzen
+Sys.setlocale("LC_TIME", "de_DE") # Viele Linux-Distributionen
+
 for (MKZ in c(
 '43420072','44406436','44416534','44416552','44425470','44429484',
 '45400522','45400717','45416459','45426108','45430523','45440655',
