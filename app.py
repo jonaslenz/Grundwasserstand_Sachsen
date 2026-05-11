@@ -152,12 +152,12 @@ with c2:
 
     for x in MKZs:
       cacheorload("ExportSN_GWS-Rohdaten_"+x+".csv")
-      
+
+      #dateparse = lambda x: datetime.datetime.strptime(x, '%Y-%m-%d')
+
       if not zeichne:
         continue
-      
-      #dateparse = lambda x: datetime.datetime.strptime(x, '%Y-%m-%d')
-        
+
       add = pd.read_csv('./cache/ExportSN_GWS-Rohdaten_'+x+'.csv',
                       sep=';',
                       thousands='.',
@@ -175,11 +175,11 @@ with c2:
       else:
         alle = pd.concat([alle, add])
 
-      fig = px.line(alle, x="MESSZEITPUNKT",y=type, color = "MKZ", height=600)
-  
+    fig = px.line(alle, x="MESSZEITPUNKT",y=type, color = "MKZ", height=600)
+
     if type == "WERT_UNTER_GELAENDE":
       fig['layout']['yaxis']['autorange'] = "reversed"
-  
+
     if type == "WERT_IM_HOEHENSYSTEM":
       if st.checkbox("zeichne Filterlage"):
         nofilter = ""
@@ -188,7 +188,7 @@ with c2:
           if pd.isna(Auswahl[Auswahl['MKZ']==allex]['FILTERUNTERKANTE'].item()):
             nofilter += allex+ "; "
             continue
-  
+
           fig.add_trace(go.Scatter(
             x=[Auswahl[Auswahl['MKZ']==allex]['Erstes_Messdatum'].item(), Auswahl[Auswahl['MKZ']==allex]['Letztes_Messdatum'].item(),
                Auswahl[Auswahl['MKZ']==allex]['Letztes_Messdatum'].item(), Auswahl[Auswahl['MKZ']==allex]['Erstes_Messdatum'].item()],
@@ -201,12 +201,12 @@ with c2:
             mode="lines",
             legendgroup=allex
           ))
-  
+
         if nofilter != "":
           st.write("Keine Filterlageninformation bei: "+ nofilter)
-  
-  
-        st.plotly_chart(fig)
+
+
+      st.plotly_chart(fig)
 
   if monat:
     if st.button("neuberechnen GWM im NW"):
