@@ -16,6 +16,8 @@ import plotly.graph_objects as go
 from DF_Filter import filter_dataframe 
 
 st.set_page_config(layout="wide")
+st.title("Ganglinien der Grundwassermessstellen Sachsen")
+
 
 def cacheorload(filename):
   if not os.path.isfile('./cache/'+filename):
@@ -82,6 +84,7 @@ with c1:
          use_container_width=True,
          height=200,
          zoom = 5)
+  st.caption("Darstellung auf der Grundlage von Daten des Sächsischen Landesamtes für Umwelt, Landwirtschaft und Geologie, gemäß den Nutzungsbestimmungen von Datenlizenz Deutschland –Namensnennung –Version 2.0 (dl−de/by−2−0) (https://www.govdata.de/dl−de/by−2−0). Jede Haftung für Schäden aller Art aus der Überlassung, Verwendung und Weiterverarbeitung der Daten ist ausgeschlossen.")
 
 with c2:
   if len(Auswahl.index) > 300:
@@ -149,4 +152,3 @@ with c2:
 
     st.plotly_chart(fig)
 
-st.caption("Darstellung auf der Grundlage von Daten des Sächsischen Landesamtes für Umwelt, Landwirtschaft und Geologie gemäß den Nutzungsbestimmungen von Datenlizenz Deutschland –Namensnennung –Version 2.0 (dl−de/by−2−0) (https://www.govdata.de/dl−de/by−2−0). − Jede Haftung für Schäden aller Art aus der Überlassung, Verwendung und Weiterverarbeitung der Daten ist ausgeschlossen.")
