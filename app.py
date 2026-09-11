@@ -149,3 +149,5 @@ with c2:
 
     st.plotly_chart(fig)
 
+st.caption("Darstellung auf der Grundlage von Daten des Sächsischen Landesamtes für Umwelt, Landwirtschaft und Geologie gemäß den Nutzungsbestimmungen von Datenlizenz Deutschland –Namensnennung –Version 2.0 (dl−de/by−2−0) (https://www.govdata.de/dl−de/by−2−0). − Jede Haftung für Schäden aller Art aus der Überlassung, Verwendung und
+Weiterverarbeitung der Daten ist ausgeschlossen.")
